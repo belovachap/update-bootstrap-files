@@ -1,4 +1,5 @@
-(ns update-bootstrap-files.core)
+(ns update-bootstrap-files.core
+  (:require [clojure.tools.logging :as log]))
 (require '[clojure.java.io :as io])
 (require '[clojure.java.shell :as shell])
 (require '[clojure.string :as string])
@@ -21,16 +22,18 @@
   (map #(hash-map :file % :date (extract-date %)) files))
 
 (defn delete-file [file]
+  (log/info "Deleting file:" file)
   (io/delete-file (.getPath (:file file))))
 
 (defn gzip-file [file]
+  (log/info "Gzipping file:" file)
   (shell/sh "gzip" "--keep" (.getPath file)))
 
 (defn zip-file [file]
+  (log/info "Zipping file:" file)
   (shell/sh "zip" (str (.getPath file) ".zip") (.getPath file)))
 
-(defn make-torrent [file]
-  (println (str "Pretend torrent-ing " file "!!!")))
+(defn make-torrent [file])
 
 (defn delete-old-files [days-ago files]
   (->> files
@@ -56,5 +59,6 @@
   )
 
 (defn -main [folder]
+  (log/info "Processing bootstrap files in folder:" folder)
   (process-bootstrap-files (str folder "/bootstrap_main"))
   (process-bootstrap-files (str folder "/bootstrap_test")))
