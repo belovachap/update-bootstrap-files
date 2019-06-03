@@ -37,7 +37,7 @@
 
 (defn delete-old-files [days-ago files]
   (->> files
-       (extract-dates)
+       extract-dates
        (filter #(t/before? (:date %) (t/minus (t/now) (t/days days-ago))))
        (map delete-file)))
 
@@ -49,10 +49,13 @@
   (make-torrent (str file ".zip")))
 
 (defn process-bootstrap-files [folder]
-  (->> (files-in-folder folder) (delete-old-files 2))
+  (->> (files-in-folder folder)
+       (delete-old-files 2)
+       doall)
   (->> (files-in-folder folder)
        (filter #(string/ends-with? (.getName %) ".dat"))
-       (map process-bootstrap-file)))
+       (map process-bootstrap-file)
+       doall))
 
 (defn update-index-file [files]
   ;; Uses a template and most recent files to build index.html
